@@ -1,0 +1,20 @@
+CREATE TABLE `pipeline_jobs` (
+	`id` varchar(64) NOT NULL,
+	`originalFilename` varchar(512) NOT NULL,
+	`fileKey` varchar(512) NOT NULL,
+	`fileUrl` varchar(1024) NOT NULL,
+	`pageCount` int NOT NULL DEFAULT 0,
+	`fileSizeBytes` bigint NOT NULL DEFAULT 0,
+	`status` enum('queued','extracting_text','classifying_pages','analyzing_visuals','building_knowledge_base','extracting_visual_assets','finalizing','completed','failed') NOT NULL DEFAULT 'queued',
+	`currentStep` int NOT NULL DEFAULT 0,
+	`totalSteps` int NOT NULL DEFAULT 7,
+	`currentPageProgress` int NOT NULL DEFAULT 0,
+	`statusMessage` text,
+	`knowledgeBaseKey` varchar(512),
+	`visualAssetsKey` varchar(512),
+	`errorMessage` text,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`completedAt` timestamp,
+	CONSTRAINT `pipeline_jobs_id` PRIMARY KEY(`id`)
+);
