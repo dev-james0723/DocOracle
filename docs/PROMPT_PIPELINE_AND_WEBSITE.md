@@ -133,11 +133,92 @@ After completing the pipeline, build a full-stack web application that serves th
 
 8. **Responsive Design** — Work on desktop and mobile.
 
+9. **Gemini Web Search Fallback** — CRITICAL FEATURE. See full specification below.
+
+### Feature 9: Gemini Web Search Fallback (Detailed Specification)
+
+This feature handles the case where the document does not contain enough information to answer the user's question. Instead of leaving the user with a dead end, the chat interface offers to search the web using Gemini's grounding/web search capability.
+
+#### How It Works (User Flow)
+
+Step 1 — The AI attempts to answer from the document as normal.
+
+Step 2 — If the retrieved evidence is insufficient (confidence below threshold, or the answer explicitly states "the document does not specify" / "not mentioned in the text"), the chat UI automatically displays a consent prompt BELOW the document-based answer:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  The document doesn't fully cover this topic.               │
+│                                                             │
+│  Would you like me to search the web for related           │
+│  information outside this document?                         │
+│                                                             │
+│  [  Search the Web  ]     [  No, thanks  ]                  │
+│                                                             │
+│  Note: Web results are from external sources and may        │
+│  not reflect the views or accuracy of this document.        │
+└─────────────────────────────────────────────────────────────┘
+```
+
+Step 3 — If the user clicks "Search the Web":
+- Call Gemini API with `google_search` tool enabled (grounding)
+- Pass both the original question AND a summary of what the document DID say as context
+- The prompt to Gemini should be: "The user is reading [document title]. The document says: [brief summary of what was found]. The user wants to know: [original question]. Please search the web for related information and provide a helpful answer, noting which parts come from external sources."
+- Display the web search result in a visually distinct panel (different background color or border) with a clear label: "From Web Search (External Sources)"
+- Show the Gemini grounding citations (URLs) as clickable links
+
+Step 4 — If the user clicks "No, thanks": dismiss the consent prompt and show nothing further.
+
+#### Detection Logic (How to Detect "Document Cannot Answer")
+
+The backend should flag a response as "insufficient" when ANY of the following are true:
+- The LLM response contains phrases like: "the document does not specify", "not mentioned in the text", "the provided text does not", "no information about", "cannot be determined from", "not covered in this document"
+- The retrieval search returns fewer than 3 matching chunks with confidence above 0.3
+- The top-scoring chunk has a relevance score below 0.25
+
+When flagged, set `webSearchAvailable: true` in the API response. The frontend reads this flag and renders the consent prompt.
+
+#### Backend Implementation
+
+Add a new API endpoint or tRPC procedure: `chat.searchWeb`
+
+```
+Input:
+  - originalQuestion: string
+  - documentContext: string  (what the document DID say, if anything)
+  - documentTitle: string
+
+Process:
+  1. Construct a grounded search prompt combining document context + question
+  2. Call Gemini API with tools: [{ googleSearch: {} }]
+  3. Extract the response text and grounding metadata (source URLs, titles)
+  4. Return: { answer: string, sources: [{title, url, snippet}] }
+
+Output:
+  - answer: string (Gemini's web-grounded response)
+  - sources: array of { title: string, url: string, snippet: string }
+  - disclaimer: "Results from external web sources. Verify independently."
+```
+
+#### Frontend Implementation
+
+In the chat component, after receiving a response with `webSearchAvailable: true`:
+1. Render the normal document-based answer first
+2. Below it, render the consent card (styled differently — e.g., amber/yellow border)
+3. On "Search the Web" click: show a loading spinner, call `chat.searchWeb`, then render the result in a distinct "Web Results" panel with a globe icon and source links
+4. On "No, thanks" click: hide the consent card with a smooth fade-out animation
+
+#### Visual Design Guidelines
+
+- Document answer panel: normal chat bubble style
+- Consent card: amber/yellow left border, subtle background, small text explaining the limitation
+- Web search result panel: blue/teal left border, globe icon (🌐) in the header, "External Sources" badge
+- Source links: displayed as small chips/pills below the answer, each showing the domain name
+
 ### Website Architecture
 
 Frontend: React + Tailwind CSS (or similar modern framework)
 Backend: Express + tRPC (or similar API framework)
-LLM: Use any available LLM API (Gemini, GPT-4, Claude, etc.)
+LLM: Gemini API (REQUIRED for web search fallback feature — see API Key Setup below)
 
 The backend must:
 - Load the 4 key JSON files at startup
@@ -146,7 +227,24 @@ The backend must:
   - Keywords (2x weight)
   - Section path (1.5x weight)
   - Full text (1x weight)
-- For each chat query: search for relevant chunks (top 8) + visual assets (top 4), construct a prompt with system prompt + evidence + question, send to LLM, return answer + citations + matched visuals
+- For each chat query: search for relevant chunks (top 8) + visual assets (top 4), construct a prompt with system prompt + evidence + question, send to LLM, return answer + citations + matched visuals + webSearchAvailable flag
+
+### API Key Setup (IMPORTANT — Ask the User)
+
+Before building the website, ask the user the following question:
+
+"This website uses the Gemini API for two features:
+  1. AI chat answers grounded in your document
+  2. Web search fallback when the document cannot answer a question (Feature 9)
+
+Do you have a Gemini API key? You can get one for free at https://aistudio.google.com/app/apikey
+
+If you have a key, please provide it now so I can configure the website. If you are using an AI agent that already includes Gemini API access natively (such as Manus AI), you may not need to provide a key — I will use the built-in API access instead."
+
+Then:
+- If the user provides a key: store it in a `.env` file as `GEMINI_API_KEY=<key>` and add `.env` to `.gitignore`
+- If the user is on an agent with native Gemini access (e.g., Manus AI): use the built-in API helper without requiring a key
+- If the user has no key and no native access: set up the website with a placeholder and show a clear setup instruction in the README
 
 ### Website Data Files
 
@@ -169,8 +267,9 @@ Generate 5 suggested prompt buttons based on the document's content. These shoul
 - Process the pipeline in parallel batches where possible.
 - Use text extraction first, then vision model for visual-heavy pages.
 - If context limits are reached, continue in batches and merge at the end.
-- After building the website, verify it works by testing at least 3 different questions.
-- When finished, provide: (1) summary of what was completed, (2) location of the output folder, (3) URL or instructions to access the website, (4) top 5 pages requiring human review, (5) 3 example questions you tested and their results.
+- Ask the user about their Gemini API key BEFORE building the website (see API Key Setup above).
+- After building the website, verify it works by testing at least 3 different questions — including at least one question that the document cannot answer, to confirm the web search fallback triggers correctly.
+- When finished, provide: (1) summary of what was completed, (2) location of the output folder, (3) URL or instructions to access the website, (4) top 5 pages requiring human review, (5) 3 example questions you tested and their results (including one web search fallback test).
 ```
 
 ---
@@ -180,7 +279,7 @@ Generate 5 suggested prompt buttons based on the document's content. These shoul
 The AI agent will produce:
 
 1. **`PDF_PROJECT_OUTPUT/` folder** — All structured JSON data files from the pipeline
-2. **A working website** — An interactive AI knowledge base with chat, glossary, sections, and visual asset retrieval
+2. **A working website** — An interactive AI knowledge base with chat, glossary, sections, visual asset retrieval, and Gemini web search fallback
 
 The 4 key JSON files that power the website are:
 
@@ -193,14 +292,48 @@ The 4 key JSON files that power the website are:
 
 ---
 
+## Feature Summary: What the Website Includes
+
+| # | Feature | Description |
+|---|---------|-------------|
+| 1 | Landing Page | Professional design with navigation and 5 suggested prompts |
+| 2 | AI Chat | Answers grounded in document with page citations |
+| 3 | Visual Asset Retrieval | Relevant diagrams/tables shown alongside answers |
+| 4 | Glossary Browser | A-Z filtering with category badges and page references |
+| 5 | Section Navigator | Chapter hierarchy with summaries and keyword tags |
+| 6 | Image Explanation | AI-generated visual summary of complex answers |
+| 7 | Dark/Light Theme | Toggle between themes |
+| 8 | Responsive Design | Works on desktop and mobile |
+| **9** | **Gemini Web Search Fallback** | **When document cannot answer, offers to search the web with user consent** |
+
+---
+
+## About the Gemini Web Search Fallback
+
+This feature addresses a common limitation of document-based AI systems: the document simply does not contain the answer to every possible question.
+
+**Example scenario** (as shown in the screenshot below):
+
+> **User asks:** "What are the brands of the mics that are recommended?"
+>
+> **Document-based answer:** "The provided text does not specify particular brands of microphones recommended for recording cello. It only recommends types of microphones, such as condenser, cardioid, and omnidirectional microphones (p. 90; p. 163)."
+>
+> **Web search fallback triggers:** The system detects the phrase "does not specify" and displays a consent card asking the user if they want to search the web for microphone brand recommendations.
+>
+> **If the user consents:** Gemini searches the web and returns brand-specific recommendations (e.g., Neumann, DPA, Schoeps) with source links, clearly labeled as external information.
+
+The key principle is **user consent first** — the system never searches the web without explicitly asking the user. This respects the user's intent (they may only want information from the document) and makes the source of every answer transparent.
+
+---
+
 ## Tips for Best Results
 
 Different AI agents have different strengths. Here are recommendations:
 
 | AI Agent | Recommendation |
 |----------|---------------|
-| **Manus AI** | Best for end-to-end execution. Can handle both pipeline and website deployment autonomously. |
-| **Claude Cowork** | Excellent at following structured prompts. May need manual deployment step. |
+| **Manus AI** | Best for end-to-end execution. Includes native Gemini API access — no key needed. Can handle both pipeline and website deployment autonomously. |
+| **Claude Cowork** | Excellent at following structured prompts. Will need user to provide Gemini API key for web search fallback. May need manual deployment step. |
 | **Open Claw** | Good for pipeline execution. Website building depends on available tools. |
-| **Cursor** | Best used after the pipeline is complete — paste the JSON files and ask it to build the website. |
+| **Cursor** | Best used after the pipeline is complete — paste the JSON files and ask it to build the website. Will prompt user for Gemini API key. |
 | **ChatGPT** | Can execute the pipeline with Code Interpreter. Website building is limited — consider using the pipeline output with a separate tool. |
