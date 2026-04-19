@@ -1,0 +1,63 @@
+[
+  {
+    "page_number": 1,
+    "visual_type": "diagram",
+    "image_file": "diagrams/page_0001.png",
+    "section": "",
+    "caption": "",
+    "description": "Photograph of microphones in a recording studio; Microphone booms; Microphone cables; A Focal Press Book logo; Audio Engineering Society logo; Routledge logo; Book title; Author names\n\nFigure elements: Photograph of microphones in a recording studio; Microphone booms; Microphone cables; A Focal Press Book logo; Audio Engineering Society logo; Routledge logo; Book title; Author names\n\nStructure: This page contains a photograph, not a diagram. The photograph is composed with a central focus on a multi-microphone array, with other microphones and studio elements visible in the foreground and background, creating a sense of depth.\n\nSpatial details: The image displays multiple microphones suspended from large booms in a recording studio setting. In the foreground, a complex microphone array is mounted on a black horizontal bar, featuring several microphones pointing downwards and outwards. Further in the background and foreground, other individual microphones are visible, also suspended from booms. The microphones are positioned at various heights and angles, suggesting a setup for recording an orchestra or large ensemble. No specific distances, angles, or measurement annotations are visible as it is a photograph, not a technical diagram.\n\nDiagram structure: This page contains a photograph, not a diagram. The photograph is composed with a central focus on a multi-microphone array, with other microphones and studio elements visible in the foreground and background, creating a sense of depth.",
+    "spatial_relationships": "The image displays multiple microphones suspended from large booms in a recording studio setting. In the foreground, a complex microphone array is mounted on a black horizontal bar, featuring several microphones pointing downwards and outwards. Further in the background and foreground, other individual microphones are visible, also suspended from booms. The microphones are positioned at various heights and angles, suggesting a setup for recording an orchestra or large ensemble. No specific distances, angles, or measurement annotations are visible as it is a photograph, not a technical diagram.",
+    "table_content": "",
+    "handwritten_annotations": "",
+    "page_summary": "This is the front cover of the book 'Classical Recording: A Practical Guide in the Decca Tradition'. The cover features a photograph of a professional recording studio setup with numerous microphones, reflecting the book's subject matter on audio engineering.",
+    "keywords": [],
+    "confidence_level": "high",
+    "retrieval_tags": [
+      "diagram",
+      "ms",
+      "photograph",
+      "spatial_layout"
+    ],
+    "image_url": "/manus-storage/page_0001_b71ee037.png"
+  },
+  {
+    "page_number": 7,
+    "visual_type": "diagram",
+    "image_file": "diagrams/page_0007.png",
+    "section": "",
+    "caption": "",
+    "description": "None detected\n\nFigure elements: None detected\n\nStructure: Not applicable as the page is blank.\n\nSpatial details: Not applicable as the page is blank.\n\nDiagram structure: Not applicable as the page is blank.",
+    "spatial_relationships": "Not applicable as the page is blank.",
+    "table_content": "",
+    "handwritten_annotations": "",
+    "page_summary": "This page is blank.",
+    "keywords": [],
+    "confidence_level": "high",
+    "retrieval_tags": [
+      "diagram",
+      "spatial_layout"
+    ],
+    "image_url": "/manus-storage/page_0007_77a98086.png"
+  },
+  {
+    "page_number": 8,
+    "visual_type": "diagram",
+    "image_file": "diagrams/page_0008.png",
+    "section": "",
+    "caption": "",
+    "description": "Book title; Subtitle; Author names; Publisher logos (A Focal Press Book, Audio Engineering Society, Routledge); Photograph of a microphone setup in a recording studio\n\nFigure elements: Book title; Subtitle; Author names; Publisher logos (A Focal Press Book, Audio Engineering Society, Routledge); Photograph of a microphone setup in a recording studio\n\nStructure: This is a photograph, not a diagram. The elements are arranged to create a visually impactful cover image, with the microphone setup as the central focus, overlaid with the book's title and author information.\n\nSpatial details: The photograph on the cover displays a professional recording studio environment, focusing on a complex microphone arrangement. In the foreground, a prominent boom arm holds a single microphone. A horizontal bar in the mid-ground supports a 'Decca Tree' array of three microphones, with two additional 'outrigger' microphones extending further out on the same bar. This entire assembly is suspended from the ceiling. The microphones are positioned to capture a wide stereo image, typical for classical music recording. The background shows acoustic treatment panels on the studio walls, and another microphone can be seen suspended in the distance. No specific measurements for distances, heights, or angles are provided on the cover.\n\nDiagram structure: This is a photograph, not a diagram. The elements are arranged to create a visually impactful cover image, with the microphone setup as the central focus, overlaid with the book's title and author information.",
+    "spatial_relationships": "The photograph on the cover displays a professional recording studio environment, focusing on a complex microphone arrangement. In the foreground, a prominent boom arm holds a single microphone. A horizontal bar in the mid-ground supports a 'Decca Tree' array of three microphones, with two additional 'outrigger' microphones extending further out on the same bar. This entire assembly is suspended from the ceiling. The microphones are positioned to capture a wide stereo image, typical for classical music recording. The background shows acoustic treatment panels on the studio walls, and another microphone can be seen suspended in the distance. No specific measurements for distances, heights, or angles are provided on the cover.",
+    "table_content": "",
+    "handwritten_annotations": "",
+    "page_summary": "This is the cover page for the book 'Classical Recording: A Practical Guide in the Decca Tradition'. It features the book's title, subtitle, authors, and publisher logos over a photograph of a professional microphone setup in a recording studio, indicating the book's focus on audio engineering for classical music.",
+    "keywords": [],
+    "confidence_level": "high",
+    "retrieval_tags": [
+      "decca tree",
+      "diagram",
+      "photograph",
+      "spatial_layout"
+    ],
+    "image_url": "/manus-storage/page_0008_a009e032.png"
+  }
+]

@@ -1,0 +1,51 @@
+[
+  {
+    "section_id": "front_matter",
+    "title": "Front Matter",
+    "level": 0,
+    "page_range": [
+      1,
+      12
+    ],
+    "parent": null,
+    "summary": "Cover, title page, copyright, dedication, table of contents, and acknowledgements.",
+    "key_concepts": [
+      "Decca tradition",
+      "Audio Engineering Society",
+      "Focal Press"
+    ]
+  },
+  {
+    "section_id": "introduction",
+    "title": "Introduction",
+    "level": 0,
+    "page_range": [
+      13,
+      20
+    ],
+    "parent": null,
+    "summary": "Overview of the book's purpose, scope, and the authors' backgrounds in classical recording at Decca and Abbey Road Studios.",
+    "key_concepts": [
+      "classical recording",
+      "Decca Records",
+      "Abbey Road Studios",
+      "recording philosophy"
+    ]
+  },
+  {
+    "section_id": "glossary_terms",
+    "title": "Glossary of Terms, Acronyms, and Abbreviations",
+    "level": 0,
+    "page_range": [
+      21,
+      26
+    ],
+    "parent": null,
+    "summary": "Definitions of technical terms, acronyms, and abbreviations used throughout the book.",
+    "key_concepts": [
+      "technical terminology",
+      "audio abbreviations",
+      "recording vocabulary"
+    ]
+  }
+]

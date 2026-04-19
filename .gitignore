@@ -1,0 +1,35 @@
+# DocOracle .gitignore
+
+# User's PDF files (copyright protection)
+input/*.pdf
+input/*.PDF
+
+# Pipeline output (generated per-user)
+output/
+
+# Local config with API keys
+pipeline/config.local.yaml
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# Node.js (website)
+website/node_modules/
+website/dist/
+website/.env
+website/.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

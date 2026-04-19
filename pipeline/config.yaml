@@ -1,0 +1,45 @@
+# ============================================================
+# DocOracle Pipeline Configuration
+# ============================================================
+# Copy this file to config.local.yaml and fill in your values.
+# config.local.yaml is gitignored and will not be committed.
+# ============================================================
+
+# LLM Provider Configuration
+llm:
+  # Provider: "gemini" (default), "openai", or "anthropic"
+  provider: "gemini"
+  
+  # API Key (or set via environment variable GEMINI_API_KEY)
+  api_key: ""
+  
+  # Model for text analysis
+  text_model: "gemini-2.5-flash"
+  
+  # Model for vision/image analysis
+  vision_model: "gemini-2.5-flash"
+
+# Pipeline Settings
+pipeline:
+  # Maximum pages to process (0 = all pages)
+  max_pages: 0
+  
+  # DPI for page-to-image conversion (higher = better quality, slower)
+  image_dpi: 200
+  
+  # Number of concurrent API requests (be careful with rate limits)
+  concurrency: 5
+  
+  # Retry failed API calls this many times
+  max_retries: 3
+
+# Output Settings
+output:
+  # Directory for pipeline output (relative to project root)
+  dir: "output"
+  
+  # Generate evaluation questions (adds ~10 min)
+  generate_eval: true
+  
+  # Generate FAQ seeds (adds ~5 min)
+  generate_faq: true

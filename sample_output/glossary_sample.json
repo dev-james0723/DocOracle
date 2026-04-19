@@ -1,0 +1,32 @@
+[
+  {
+    "term": "Absorption",
+    "definition": "The process by which a material or surface reduces the energy of sound waves, minimizing reflections and reverberation.",
+    "category": "acoustics",
+    "supporting_pages": "10-15"
+  },
+  {
+    "term": "Ambient Noise",
+    "definition": "Background sound present in a recording environment, which can affect the clarity and quality of a recording.",
+    "category": "acoustics",
+    "supporting_pages": "16-18"
+  },
+  {
+    "term": "Bass Trap",
+    "definition": "Acoustic treatment designed to absorb low-frequency sound waves to control bass buildup in a room.",
+    "category": "acoustics",
+    "supporting_pages": "20-22"
+  },
+  {
+    "term": "Blumlein Pair",
+    "definition": "A stereo microphone technique using two figure-8 microphones placed at 90 degrees to each other to capture a realistic stereo image.",
+    "category": "microphone_technique",
+    "supporting_pages": "45-48"
+  },
+  {
+    "term": "Cardioid Microphone",
+    "definition": "A microphone with a heart-shaped polar pattern that primarily picks up sound from the front and rejects sound from the rear.",
+    "category": "microphone_technique",
+    "supporting_pages": "30-33"
+  }
+]
