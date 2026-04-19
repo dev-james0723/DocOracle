@@ -1,10 +1,172 @@
 # DocOracle
 
-**Turn any PDF into an AI-powered Knowledge Base with chat, diagrams, and citations.**
+**Turn any PDF into an AI-powered Knowledge Base — with chat, diagrams, citations, and a deployable website.**
 
-DocOracle is an open-source pipeline that transforms any PDF document into a fully functional AI knowledge base website. Upload a textbook, manual, or technical guide — DocOracle extracts every page, analyzes every diagram with Gemini Vision, builds structured data, and generates an interactive AI chat interface where users can ask questions and get answers with page-level citations and relevant diagrams.
+DocOracle is an open-source project that transforms any PDF document into a fully structured AI knowledge base. It extracts every page, analyzes every diagram with Gemini Vision, builds searchable data, and optionally generates an interactive website where users can ask questions and get answers grounded in the original document — with page-level citations and relevant diagrams displayed alongside every response.
 
 ![Landing Page](screenshots/01_landing_page.webp)
+
+---
+
+## Why DocOracle? (Why Not Just Upload a PDF to ChatGPT?)
+
+You might be wondering: *"Can't I just upload my PDF to ChatGPT or Claude and ask questions?"*
+
+You can — but here is what happens when you do:
+
+| | Uploading PDF to ChatGPT/Claude | DocOracle |
+|---|---|---|
+| **Page citations** | Vague or missing — the LLM cannot reliably tell you which page an answer comes from | Every answer includes exact page numbers, because the pipeline preserves page boundaries |
+| **Diagrams and images** | Ignored or poorly described — most LLMs skip over visual content entirely | Every diagram, table, and photo is analyzed by Gemini Vision with detailed spatial descriptions and retrieval tags |
+| **Large documents (200+ pages)** | Context window overflow — the LLM silently drops content, leading to incomplete or hallucinated answers | The pipeline processes every page individually, then builds retrieval-optimized chunks — no content is lost |
+| **Consistency** | Different answers each time you ask the same question | Structured JSON data ensures deterministic retrieval — the same question always finds the same evidence |
+| **Reusability** | Locked inside one chat session — you cannot share, search, or build on it | Output is standard JSON files that can power a website, feed a RAG system, or integrate into any application |
+| **Glossary and structure** | None — you get raw answers with no navigation | Auto-generated glossary with category badges, chapter/section navigator with summaries and keyword tags |
+| **Shareable product** | A private chat thread | A deployable website that anyone on your team (or your readers, students, or customers) can use |
+
+In short, uploading a PDF to an LLM gives you a **disposable conversation**. DocOracle gives you a **permanent, structured, shareable knowledge base** that preserves every page, every diagram, and every citation.
+
+---
+
+## Who Is This For?
+
+DocOracle serves different types of users depending on their technical background and goals. Read the category that matches you.
+
+### Category 1 — Non-Technical Users (No Coding Required)
+
+These users want to turn a PDF into an AI knowledge base without writing code or running scripts.
+
+#### 1.1 Try the Live Demo (Zero Setup)
+
+**You are:** Anyone with a PDF who wants to try DocOracle immediately, without installing anything.
+
+**What you do:** Visit the [DocOracle Live Demo](https://decca-oracle.manus.space), click "Try with Your PDF," upload your document, and wait for the pipeline to process it. Once complete, you can chat with the AI about your document — with citations and diagrams — directly in your browser.
+
+**What you need:** A web browser and a PDF file. Nothing else.
+
+> This is the fastest way to experience DocOracle. No downloads, no Terminal, no API keys.
+
+#### 1.2 Build a Standalone AI Knowledge Base Website (No-Code Tools)
+
+**You are:** Someone who uses AI-powered web builders like [Base44](https://base44.com), [Lovable](https://lovable.dev), [Vibecoding.ai](https://vibecoding.ai), or [Cursor](https://cursor.sh), and you want to build your own AI knowledge base website from your PDF.
+
+**What you do:** Run the DocOracle pipeline (or have an AI agent run it for you — see [Category 2](#category-2--developers--technical-users)) to process your PDF into 4 JSON data files. Then use your preferred no-code builder to create a website that reads those JSON files and provides an AI chat interface. You can use DocOracle's website source code as a reference or prompt template.
+
+**What you get:** A standalone website you own and control, powered by your document's content.
+
+#### 1.3 Build an Embeddable AI Chat Widget for Your Existing Website
+
+**You are:** Someone who already has a website (company site, WordPress blog, portfolio, etc.) and wants to add an AI-powered "Ask My Document" chat widget to it.
+
+**What you do:** Same as 1.2, but instead of building a full website, you build a lightweight chat widget using a no-code tool, then embed it into your existing site via `<iframe>` or `<script>` tag.
+
+**What you get:** An AI chat window embedded in your current website — visitors can ask questions about your PDF content without leaving your site.
+
+---
+
+### Category 2 — Developers and Technical Users
+
+These users are comfortable with Terminal, Python, and/or JavaScript, and want more control over the pipeline and output.
+
+#### 2.1 Full-Stack Developer (Build an AI Knowledge Base MVP Fast)
+
+**You are:** A developer who knows React/Node.js and wants to quickly build an AI knowledge base for a client or project — without writing the entire PDF processing pipeline from scratch.
+
+**What you do:** Clone this repo, place your PDF in `input/`, run the pipeline, and launch the website. Customize the UI, swap the LLM provider, or extend the API as needed. See the [Quick Start](#quick-start) section below.
+
+**What you get:** A working AI knowledge base website in under a day, with chat, glossary, section navigation, and visual asset retrieval — all ready to demo or deploy.
+
+#### 2.2 Use an AI Agent to Run the Pipeline Only (Get JSON Output)
+
+**You are:** A developer or data engineer who wants the structured JSON output from the pipeline, but does not need the website. You plan to feed the data into your own RAG system, search engine, or custom application.
+
+**What you do:** Copy the ready-made prompt below, paste it into any capable AI agent (ChatGPT, Claude, Manus AI, Open Claw, Claude Cowork, etc.), and attach your PDF. The AI agent will execute the full pipeline and produce the `PDF_PROJECT_OUTPUT/` folder with all deliverables.
+
+**What you get:** 4 key JSON files (`page_chunks.jsonl`, `glossary.json`, `sections.json`, `visual_assets_index.json`) plus evaluation questions, a system prompt, and visual asset metadata — all in standard JSON format readable by any programming language.
+
+> **Copy-paste prompt for this use case:** See [`docs/PROMPT_PIPELINE_ONLY.md`](docs/PROMPT_PIPELINE_ONLY.md)
+
+#### 2.3 Use an AI Agent to Run Pipeline AND Build the Website (End-to-End)
+
+**You are:** A developer, founder, or technical user who wants an AI agent to do everything — process the PDF and build a complete, deployable AI knowledge base website — in a single session.
+
+**What you do:** Copy the ready-made prompt below, paste it into a capable AI agent (Manus AI, Claude Cowork, Open Claw, etc.), and attach your PDF. The AI agent will execute the full pipeline, generate the JSON data, and then build and deploy an interactive website with AI chat, glossary, section navigation, and visual asset retrieval.
+
+**What you get:** A fully functional AI knowledge base website, ready to share with your team, clients, or audience.
+
+> **Copy-paste prompt for this use case:** See [`docs/PROMPT_PIPELINE_AND_WEBSITE.md`](docs/PROMPT_PIPELINE_AND_WEBSITE.md)
+
+#### 2.4 Backend / Data Engineer (Pipeline Only, Build Your Own Frontend)
+
+**You are:** A Python developer or data engineer who already has a frontend or application. You only need a reliable PDF-to-structured-data pipeline.
+
+**What you do:** Use only the `pipeline/` directory. Run the scripts locally on your machine. The output JSON files can be integrated into any tech stack — Python, PHP, Go, Java, Ruby, or anything that reads JSON.
+
+**What you get:** Clean, structured JSON data with page-level text chunks, a glossary, section hierarchy, and visual asset metadata — ready to plug into your existing system.
+
+---
+
+### Category 3 — Business and Enterprise Users
+
+These users have documents they want to make searchable and AI-powered, but may need technical help with setup.
+
+#### 3.1 Corporate Training / HR Departments
+
+**You are:** An HR manager or training lead with employee handbooks, SOPs, compliance manuals, or onboarding materials in PDF format.
+
+**Your goal:** Let employees ask questions like *"What is the leave policy?"* or *"How do I submit an expense report?"* and get instant, accurate answers with page references — instead of searching through a 200-page PDF.
+
+**How to use DocOracle:** Have your IT team run the pipeline (or use an AI agent with the prompts in Category 2), then deploy the website internally for your staff.
+
+#### 3.2 Authors and Publishers
+
+**You are:** An author, technical writer, or publisher who has written a book or manual and wants to offer readers an AI-powered companion.
+
+**Your goal:** Let readers ask *"What does Chapter 5 cover?"* or *"Explain the relationship between aperture and depth of field"* and get answers grounded in your book, with page citations.
+
+**How to use DocOracle:** Process your book's PDF through the pipeline, then deploy the website as a companion to your publication. Your readers get an "Ask the Book" AI experience.
+
+---
+
+### Category 4 — Researchers and Academics
+
+#### 4.1 Researchers, Scholars, and Graduate Students
+
+**You are:** A researcher working with lengthy government reports, academic papers, policy documents, or technical specifications.
+
+**Your goal:** Quickly find specific clauses, data points, or arguments buried in a 500-page document — without reading it cover to cover.
+
+**How to use DocOracle:** Run the pipeline on your document and launch the website locally (no need to deploy publicly). Use the AI chat to query your document with full citation support.
+
+---
+
+### Category 5 — Educators and Training Institutions
+
+#### 5.1 Teachers and Educational Institutions
+
+**You are:** A teacher, professor, or tutoring center with textbooks, lecture notes, or study materials.
+
+**Your goal:** Give students an AI study assistant that answers questions like *"What is Newton's Third Law?"* with answers grounded in the actual textbook — citing specific pages, not generating generic responses.
+
+**How to use DocOracle:** Process the textbook PDF, deploy the website for your students. Every answer includes page numbers, so students can verify and read further in the original material.
+
+---
+
+### Quick Reference: Which Path Is Right for You?
+
+| # | User Type | Technical Level | What You Use | What You Get |
+|---|-----------|----------------|-------------|-------------|
+| 1.1 | **Live Demo user** | None | Live Demo website | Instant AI chat with your PDF |
+| 1.2 | **No-code builder (standalone site)** | Low | Pipeline + No-code tool | Your own AI knowledge base website |
+| 1.3 | **No-code builder (embed widget)** | Low | Pipeline + No-code tool | AI chat widget on your existing site |
+| 2.1 | **Full-stack developer** | High | Pipeline + Website template | Customizable AI knowledge base MVP |
+| 2.2 | **AI Agent user (pipeline only)** | Medium | Copy-paste prompt + AI agent | Structured JSON data files |
+| 2.3 | **AI Agent user (pipeline + website)** | Medium | Copy-paste prompt + AI agent | Complete AI knowledge base website |
+| 2.4 | **Backend / Data engineer** | High | Pipeline only | JSON data for your own system |
+| 3.1 | **Corporate / HR** | Low (needs IT help) | Pipeline + Website | Internal employee knowledge base |
+| 3.2 | **Author / Publisher** | Low-Medium | Pipeline + Website | AI companion for your book |
+| 4.1 | **Researcher / Academic** | Medium | Pipeline + Website (local) | Private document knowledge base |
+| 5.1 | **Teacher / Educator** | Low-Medium | Pipeline + Website | AI study assistant for students |
 
 ---
 
@@ -63,7 +225,7 @@ The built-in demo page lets anyone upload a PDF and experience the full pipeline
 | Feature | Description |
 |---------|-------------|
 | **Gemini Vision Analysis** | Every diagram, table, and image is analyzed by Gemini Vision with detailed spatial descriptions |
-| **AI Chat with Citations** | Ask questions and get answers grounded in the book, with page numbers cited |
+| **AI Chat with Citations** | Ask questions and get answers grounded in the document, with page numbers cited |
 | **Visual Asset Retrieval** | Relevant diagrams automatically appear alongside chat answers |
 | **Glossary Browser** | Alphabetical glossary with category badges and page references |
 | **Section Navigator** | Full book structure with summaries and keyword tags |
@@ -74,6 +236,8 @@ The built-in demo page lets anyone upload a PDF and experience the full pipeline
 ---
 
 ## Quick Start
+
+> This section is for **developers** (User Types 2.1 and 2.4). If you are a non-technical user, see [Category 1](#category-1--non-technical-users-no-coding-required) above.
 
 ### Prerequisites
 
@@ -139,6 +303,67 @@ npm run dev
 ```
 
 Open `http://localhost:3000` in your browser. Your AI knowledge base is ready.
+
+---
+
+## Using DocOracle with AI Agents (User Types 2.2 and 2.3)
+
+If you prefer to have an AI agent do the work for you, DocOracle provides ready-made prompts that you can copy and paste into any capable AI agent.
+
+### Supported AI Agents
+
+| AI Agent | Best For | Notes |
+|----------|----------|-------|
+| [Manus AI](https://manus.im) | Pipeline + Website (end-to-end) | Full autonomous execution with file system access |
+| [Claude](https://claude.ai) (with Projects or Artifacts) | Pipeline prompt execution | Excellent at following structured prompts |
+| [ChatGPT](https://chatgpt.com) (with Code Interpreter) | Pipeline prompt execution | Can run Python scripts and process files |
+| [Open Claw](https://openclaw.com) | Pipeline + Website | Open-source AI agent with tool use |
+| [Claude Cowork](https://claude.ai) | Pipeline + Website | Collaborative coding and deployment |
+| [Cursor](https://cursor.sh) | Website customization | AI-powered code editor, great for modifying the website template |
+
+### Prompt A: Pipeline Only (Get JSON Output)
+
+Use this when you want the structured data files but plan to build your own frontend or integrate into an existing system.
+
+**Full prompt with instructions:** [`docs/PROMPT_PIPELINE_ONLY.md`](docs/PROMPT_PIPELINE_ONLY.md)
+
+**Quick summary of what the prompt tells the AI agent to do:**
+
+1. Accept your uploaded PDF
+2. Extract text from every page using `pdftotext`
+3. Convert every page to a high-resolution image
+4. Analyze visual pages with Gemini Vision API
+5. Build page-level canonical records with citations
+6. Generate a glossary, section map, and FAQ seeds
+7. Create retrieval-optimized chunks for RAG
+8. Extract and index all visual assets (diagrams, tables, photos)
+9. Produce the complete `PDF_PROJECT_OUTPUT/` folder
+
+**Output you receive:** A folder containing `page_chunks.jsonl`, `glossary.json`, `sections.json`, `visual_assets_index.json`, evaluation questions, a system prompt, and all extracted visual assets with metadata.
+
+### Prompt B: Pipeline + Website (End-to-End)
+
+Use this when you want the AI agent to process your PDF AND build a complete, deployable website in one session.
+
+**Full prompt with instructions:** [`docs/PROMPT_PIPELINE_AND_WEBSITE.md`](docs/PROMPT_PIPELINE_AND_WEBSITE.md)
+
+**Quick summary of what the prompt tells the AI agent to do:**
+
+Everything in Prompt A, plus:
+
+1. Build a React + Express + tRPC website
+2. Implement AI chat with retrieval-augmented generation (RAG)
+3. Display page-level citations in every answer
+4. Retrieve and show relevant diagrams alongside answers
+5. Add a glossary browser with alphabetical filtering
+6. Add a section navigator with summaries
+7. Deploy the website (or provide deployment instructions)
+
+**Output you receive:** A fully functional AI knowledge base website, plus all the JSON data files from the pipeline.
+
+### SKILL.md for AI Agent Integration
+
+For AI agents that support skill/instruction files (such as Manus AI), DocOracle provides a [`SKILL.md`](SKILL.md) file at the repository root. This file contains structured instructions that an AI agent can load to understand and execute the DocOracle pipeline autonomously.
 
 ---
 
@@ -229,27 +454,14 @@ The `sample_output/` directory contains excerpts from a real pipeline run so you
 
 ---
 
-## Use Cases
-
-DocOracle works with any PDF document. Here are some examples:
-
-| Use Case | PDF Type | Who Benefits |
-|----------|----------|-------------|
-| **Medical Knowledge Base** | Hospital procedure manual | Doctors and nurses querying protocols |
-| **Legal Research** | Contract templates or regulations | Lawyers searching for clauses |
-| **Technical Documentation** | Engineering specifications | Engineers finding procedures |
-| **Academic Tutoring** | Textbooks or research papers | Students asking study questions |
-| **Training Materials** | Employee handbooks | HR teams building onboarding tools |
-| **Music/Audio** | Recording technique guides | Audio engineers learning methods |
-
----
-
 ## Project Structure
 
 ```
 DocOracle/
 ├── README.md              # This file
+├── SKILL.md               # AI agent instruction file
 ├── LICENSE                # MIT License
+├── CONTRIBUTING.md        # Contribution guidelines
 ├── .gitignore             # Protects PDFs and API keys
 ├── pipeline/              # Python processing scripts
 │   ├── run_all.sh             # One-command pipeline runner
@@ -260,11 +472,13 @@ DocOracle/
 │   ├── client/                # React frontend
 │   ├── server/                # Express + tRPC backend
 │   └── server/data/           # Place output files here
+├── docs/                  # Documentation and prompts
+│   ├── PIPELINE_PROMPT.md         # Full pipeline instruction document (v2.0)
+│   ├── PROMPT_PIPELINE_ONLY.md    # Copy-paste prompt for AI agents (pipeline only)
+│   ├── PROMPT_PIPELINE_AND_WEBSITE.md  # Copy-paste prompt for AI agents (pipeline + website)
+│   ├── USER_GUIDE.md             # Step-by-step user guide
+│   └── GITHUB_GUIDE.md           # GitHub publishing guide
 ├── sample_output/         # Example output files
-├── docs/                  # Additional documentation
-│   ├── PIPELINE_PROMPT.md     # Detailed pipeline instructions
-│   ├── USER_GUIDE.md          # Step-by-step user guide
-│   └── GITHUB_GUIDE.md        # GitHub publishing guide
 ├── input/                 # Place your PDF here
 └── screenshots/           # README screenshots
 ```
@@ -307,7 +521,7 @@ The Gemini free tier allows approximately 50 vision requests per day. For faster
 
 If you want to integrate DocOracle's output into your own application instead of using the provided website:
 
-**The pipeline output is standard JSON.** You can read `page_chunks.jsonl`, `glossary.json`, `sections.json`, and `visual_assets_index.json` from any programming language (Python, PHP, Java, Ruby, Go, etc.) and build your own search and chat interface on top.
+The pipeline output is standard JSON. You can read `page_chunks.jsonl`, `glossary.json`, `sections.json`, and `visual_assets_index.json` from any programming language (Python, PHP, Java, Ruby, Go, etc.) and build your own search and chat interface on top.
 
 **Key integration points:**
 
