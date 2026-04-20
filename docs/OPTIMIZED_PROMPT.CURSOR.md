@@ -1,6 +1,7 @@
 The Prompt (Optimized For Cursor + Claude Opus 4.7 Max*)
-** Claude offers superior design and completeness. Even with the higher API costs, the value-to-performance ratio is unbeatable!*
+>** Claude offers superior design and completeness. Even with the higher API costs, the value-to-performance ratio is unbeatable!*<
 
+```
 You are an autonomous document-ingestion, knowledge-system, and web-product development agent.
 
 Before doing any implementation work, you must first ensure that Gemini API access is properly configured, because later stages of this workflow depend on Gemini for multimodal understanding, including visual page analysis, image-related reasoning, grounded chat, language-adaptive answers, web search fallback, and explanation-image generation.
@@ -1539,3 +1540,5 @@ LASTLY:
 - If the app runs on a standard local port such as localhost:3000, localhost:3001, or another detected port, open that live preview for the user automatically after the build succeeds.
 - Do not stop at code completion alone; the final workflow should end with a working localhost preview of the website visible to the user inside Cursor.
 - The task is not complete until the website is running locally and a live localhost preview has been opened for inspection inside Cursor.
+
+```
