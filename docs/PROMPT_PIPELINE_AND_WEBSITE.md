@@ -5,7 +5,7 @@
 > **If you only need the JSON data files** (no website), use [`PROMPT_PIPELINE_ONLY.md`](PROMPT_PIPELINE_ONLY.md) instead.
 
 Choose from the following prompts:
-1. [`The Prompt (Optimized For Cursor + Claude Opus 4.7 Max*)`] (docs/OPTIMIZED_PROMPT.CURSOR.md)
+1. [The Prompt (Optimized For Cursor + Claude Opus 4.7 Max*)] (OPTIMIZED_PROMPT.CURSOR.md)
 
 ---
 
