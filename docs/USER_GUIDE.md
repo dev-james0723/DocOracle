@@ -1,170 +1,279 @@
-# DocOracle：用戶使用詳細指南（用真實例子解釋）
+# DocOracle: Detailed User Guide with Real Examples
 
-> 本文用一個真實例子，逐步展示用戶如何使用你嘅 DocOracle pipeline
-
----
-
-## 真實例子：一個醫院想建立內部醫學知識庫
-
-假設有一間醫院，佢哋有一本 600 頁嘅《急診醫學手冊》（PDF 格式）。佢哋想讓醫生可以通過 AI 聊天嘅方式快速查詢，而唔係每次都翻書。
-
-醫院嘅 IT 部門主管決定用你嘅 DocOracle 項目。以下係佢哋會點樣做：
+> This guide walks through exactly how DocOracle works — using real screenshots, real feature descriptions, and real conversation examples drawn from the live demo at [decca-oracle.manus.space](https://decca-oracle.manus.space).
 
 ---
 
-## 第一步：用戶下載你嘅 GitHub 項目
+## Language | 語言 | 言語 | Sprache
 
-用戶進入你嘅 GitHub 倉庫 `github.com/你嘅用戶名/DocOracle`，見到一個綠色嘅按鈕寫著 **「Code」**。佢哋撳下去，選擇 **「Download ZIP」**。
-
-```
-github.com/你嘅用戶名/DocOracle
-│
-├── 綠色 Code 按鈕 ← 用戶撳呢度
-│   └── Download ZIP ← 下載成一個 zip 檔
-```
-
-佢哋會下載到一個叫 `DocOracle-main.zip` 嘅檔案。
+[English](USER_GUIDE.md) · [繁體中文](USER_GUIDE.zh-TW.md) · [简体中文](USER_GUIDE.zh-CN.md) · [日本語](USER_GUIDE.ja.md) · [Deutsch](USER_GUIDE.de.md)
 
 ---
 
-## 第二步：解壓縮，看到嘅文件結構
+## Real Example: A Hospital Wants to Build an Internal Medical Knowledge Base
 
-用戶解壓縮後，見到嘅文件結構係咁樣：
+Imagine a hospital that has a 600-page *Emergency Medicine Handbook* in PDF format. They want their doctors to be able to query it through an AI chat interface instead of flipping through the book every time.
 
-```
-DocOracle-main/
-│
-├── README.md                    ← 最重要！用戶第一樣睇嘅
-│
-├── QUICK_START.md              ← 「我想 5 分鐘內跑起來」
-│
-├── docs/
-│   ├── FULL_GUIDE.md           ← 詳細步驟
-│   ├── ARCHITECTURE.md         ← 系統點樣運作
-│   └── EXAMPLE_OUTPUT.md       ← 輸出會係咩樣
-│
-├── pipeline/
-│   ├── requirements.txt        ← Python 依賴（pip install -r requirements.txt）
-│   ├── run_all.sh              ← 一鍵執行全部（用戶只需要行呢個）
-│   │
-│   ├── 01_build_inventory.py
-│   ├── 02_generate_page_records.py
-│   ├── 03_build_visual_summary.py
-│   ├── 04_merge_all_records.py
-│   ├── 05_build_glossary_faq.py
-│   ├── 06_build_retrieval.py
-│   ├── 07_build_eval.py
-│   ├── 08_identify_visual_pages.py
-│   ├── 09_build_visual_assets.py
-│   ├── 10_build_visual_metadata.py
-│   └── config.yaml             ← 用戶可以改呢啲設定
-│
-├── website/
-│   ├── README.md               ← 網站部署說明
-│   ├── package.json
-│   ├── client/
-│   │   ├── src/
-│   │   │   ├── pages/
-│   │   │   │   ├── Chat.tsx
-│   │   │   │   ├── Glossary.tsx
-│   │   │   │   └── ...
-│   │   └── ...
-│   ├── server/
-│   │   ├── knowledgeBase.ts
-│   │   ├── routers.ts
-│   │   ├── data/
-│   │   │   └── .gitkeep         ← 空目錄，用戶嘅數據會放呢度
-│   │   └── ...
-│   └── ...
-│
-├── input/                       ← 用戶要將自己嘅 PDF 放呢度
-│   └── .gitkeep
-│
-├── output/                      ← Pipeline 會生成嘅結果放呢度
-│   └── .gitkeep
-│
-└── .gitignore                   ← 告訴 Git 忽略咩嘢
-```
+The hospital's IT manager decides to use DocOracle. Here is exactly what they do — and what they see at every step.
 
 ---
 
-## 第三步：用戶準備自己嘅 PDF
+## Step 1: Try the Live Demo First (Zero Setup)
 
-醫院嘅 IT 部門將《急診醫學手冊.pdf》放入 `input/` 目錄：
+Before installing anything, the IT manager visits the DocOracle live demo at **[decca-oracle.manus.space](https://decca-oracle.manus.space)**.
 
-```
-DocOracle-main/
-├── input/
-│   └── 急診醫學手冊.pdf         ← 用戶放自己嘅 PDF 喺呢度
-├── output/
-│   └── (空嘅，等緊被填滿)
-└── ...
-```
+The landing page shows a clean interface with two options:
+
+- **"Explore the Demo"** — loads a pre-processed sample document so you can immediately see what the Knowledge Hub looks like without uploading anything.
+- **"Try with Your PDF"** — lets you upload your own PDF and run the full pipeline on it.
+
+The IT manager clicks **"Try with Your PDF"**, uploads a 50-page excerpt of the handbook, and waits.
 
 ---
 
-## 第四步：用戶打開終端機（Terminal / Command Prompt），行 pipeline
+## Step 2: The Upload and Pipeline Processing Screen
 
-用戶喺自己嘅電腦上打開終端機，進入 DocOracle 目錄：
+After uploading, the user is taken to the **Recent Uploads** screen. This screen shows all previously submitted PDFs and their current processing status.
+
+Each item in the list shows:
+
+| Column | What it means |
+|--------|---------------|
+| **Filename** | The name of the uploaded PDF |
+| **Status badge** | One of: `queued`, `processing`, `completed`, or `failed` |
+| **"View Progress" button** | Opens the job detail page for that upload |
+| **Trash icon button** | Deletes the job immediately (available for all statuses) |
+
+> **Real example from the live demo:** After uploading *Emergency_Medicine_Excerpt.pdf*, the Recent Uploads list shows:
+>
+> ```
+> Emergency_Medicine_Excerpt.pdf   [processing]   [View Progress]  [🗑]
+> ```
+
+The trash icon (🗑) appears on the **left side** of the "View Progress" button. You can delete any job at any time — including jobs that are still queued or currently processing — to prevent them from consuming further API credits.
+
+---
+
+## Step 3: Watching the Pipeline Run
+
+Clicking **"View Progress"** opens the job detail page. While the pipeline is running, you see a live progress indicator showing which of the 12 steps is currently executing:
+
+```
+[2026-04-19 10:00:00] Starting DocOracle pipeline...
+[2026-04-19 10:00:05] Step 1: Building page inventory...
+  - Analyzing 50 pages
+  - Classifying pages: 38 text pages, 7 diagram pages, 5 mixed
+[2026-04-19 10:15:30] Step 2: Generating page records with Gemini Vision...
+  - Processing pages 1-10...
+  - Processing pages 11-20...
+  [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 25%
+...
+[2026-04-19 10:45:00] ✅ Pipeline complete!
+```
+
+Processing time depends on document size:
+
+| Pages | Estimated Time |
+|-------|---------------|
+| 50 | ~15 minutes |
+| 200 | ~1 hour |
+| 500 | ~3 hours |
+
+---
+
+## Step 4: What Happens If the Pipeline Fails
+
+Sometimes the pipeline fails — for example, if the Gemini API rate limit is hit, or if the PDF contains unusual encoding. When this happens, the job detail page shows a clear **"Pipeline Failed"** error card.
+
+The card shows two buttons side by side:
+
+- **"Try Again"** — re-queues the job and attempts the pipeline from the beginning.
+- **"Delete"** — permanently removes the job from the system.
+
+> **Why the Delete button matters here:** If a job fails repeatedly, clicking "Try Again" over and over will keep consuming API credits without producing results. The Delete button lets you remove the failed job cleanly so it does not keep retrying in the background.
+
+**Real example:** The IT manager uploaded a corrupted PDF by mistake. The pipeline failed at Step 2. Instead of clicking "Try Again" (which would fail again), they clicked **"Delete"**, then re-uploaded the correct file.
+
+---
+
+## Step 5: The Knowledge Hub — What You See After Pipeline Completes
+
+This is the most important part of the guide. Once the pipeline finishes successfully, the job detail page transforms into the **Knowledge Hub** — a full tabbed interface with three sections.
+
+### The Stats Bar
+
+At the top of the Knowledge Hub, a stats bar shows a quick summary of what was extracted:
+
+```
+📄 50 pages   |   🖼 12 visual assets   |   📑 8 sections   |   📖 23 glossary terms
+```
+
+### Tab 1: Book Structure
+
+The **Book Structure** tab shows the complete chapter and section hierarchy of your document. Each entry displays:
+
+- Section title and page range (e.g., "Chapter 3: Chest Pain Assessment — pages 42–67")
+- A one-paragraph summary of what that section covers
+- Key topic tags (e.g., `ECG`, `troponin`, `differential diagnosis`)
+
+**Clicking any section** opens a pre-filled chat question about that section. For example, clicking "Chapter 3: Chest Pain Assessment" automatically asks: *"What does Chapter 3 cover about chest pain assessment?"*
+
+> **Real example from the live demo:** The IT manager browsed to "Chapter 5: Trauma Protocols" and clicked it. The AI immediately answered with a structured summary of the chapter, citing specific pages from the handbook.
+
+### Tab 2: Glossary
+
+The **Glossary** tab shows every technical term extracted from the document, displayed as searchable cards. Each card shows:
+
+- The term (e.g., "Troponin I")
+- Its definition as extracted from the document
+- The page number(s) where it appears
+- A category badge (e.g., `Biomarker`, `Diagnostic`)
+
+There is a **search bar** at the top of the Glossary tab. Typing "ECG" filters the list to show only ECG-related terms.
+
+**Clicking any glossary card** opens a pre-filled chat question. For example, clicking "Troponin I" asks: *"Can you explain Troponin I in more detail?"*
+
+> **Real example from the live demo:** A doctor used the Glossary tab to look up "STEMI" (ST-Elevation Myocardial Infarction). The card showed the definition, the page range (pp. 246–251), and a `Cardiology` badge. Clicking the card opened a chat asking for more detail, and the AI responded with a full explanation citing pages 246, 248, and 250.
+
+### Tab 3: Start Asking
+
+The **Start Asking** tab shows 6 suggested questions generated from the document content. These are designed to help new users understand what kinds of questions DocOracle can answer.
+
+Example suggested questions for the Emergency Medicine Handbook:
+
+1. "What are the first-line treatments for anaphylaxis?"
+2. "How should I assess a patient with altered mental status?"
+3. "What imaging is recommended for suspected pulmonary embolism?"
+4. "What are the criteria for activating a trauma team?"
+5. "How do I interpret a 12-lead ECG for STEMI?"
+6. "What medications are contraindicated in pregnancy emergencies?"
+
+Clicking any suggested question sends it directly to the AI chat.
+
+---
+
+## Step 6: Using the AI Chat
+
+After exploring the Knowledge Hub tabs, the doctor clicks one of the suggested questions or types their own. The AI responds with:
+
+1. A structured answer grounded in the document
+2. Exact page number citations
+3. Relevant diagrams or tables displayed alongside the answer
+
+**Real example conversation:**
+
+> **Doctor:** "If a patient has severe chest pain, what tests should I run?"
+>
+> **DocOracle AI:** "According to the handbook (pages 245–250), for a patient presenting with severe chest pain, the following tests are recommended:
+>
+> 1. **ECG (Electrocardiogram)** — Perform within 10 minutes of arrival. See page 246 for interpretation guidelines.
+> 2. **Chest X-Ray** — To rule out pneumothorax and aortic dissection. See page 248.
+> 3. **Blood Tests** — Troponin I, BNP, D-dimer. See page 250 for reference ranges.
+>
+> [Diagram: ECG interpretation flowchart — extracted from page 247]
+>
+> [Button: **Turn into image explanation** — click to generate a visual summary of this answer]"
+
+The **"Turn into image explanation"** button generates an AI-created visual diagram summarising the answer — useful for quick reference or teaching.
+
+---
+
+## Step 7: Managing Your Uploads
+
+### Deleting a Job from the Recent Uploads List
+
+On the main DocOracle page, the **Recent Uploads** section lists all your processed documents. Every row has a trash icon (🗑) button to the left of the "View Progress" button.
+
+You can delete **any job regardless of status**:
+
+| Status | Can delete? | Effect |
+|--------|-------------|--------|
+| `queued` | Yes | Cancels the job before it starts |
+| `processing` | Yes | Stops the pipeline mid-run |
+| `completed` | Yes | Removes the knowledge base permanently |
+| `failed` | Yes | Cleans up the failed job |
+
+> **Why this matters:** Failed jobs that are not deleted may be retried automatically, consuming API credits. Deleting them immediately stops this.
+
+### Deleting a Job from the Job Detail Page
+
+When you are viewing a specific job (whether it succeeded or failed), there is also a **Delete** button directly on that page:
+
+- On a **completed** job: the Delete button appears in the Knowledge Hub header, next to the document title.
+- On a **failed** job: the Delete button appears next to the "Try Again" button inside the error card.
+
+---
+
+## Step 8: Deploying Your Own Instance (Developer Path)
+
+If you want to run DocOracle on your own server with your own documents, follow the steps below.
+
+### Prerequisites
+
+| Requirement | Version | Purpose |
+|-------------|---------|---------|
+| Python | 3.9+ | Pipeline scripts |
+| Node.js | 18+ | Website |
+| pdftotext | any | Text extraction (`sudo apt-get install poppler-utils`) |
+| Gemini API Key | — | Vision analysis and chat ([Get a free key](https://aistudio.google.com/app/apikey)) |
+
+### Step-by-Step
+
+**1. Clone the repository**
 
 ```bash
-cd ~/Downloads/DocOracle-main
+git clone https://github.com/dev-james0723/DocOracle.git
+cd DocOracle
 ```
 
-然後行一個簡單嘅命令：
+**2. Place your PDF in the `input/` folder**
+
+```bash
+cp /path/to/your/handbook.pdf input/
+```
+
+**3. Install pipeline dependencies**
+
+```bash
+pip install -r pipeline/requirements.txt
+```
+
+**4. Set your Gemini API key**
+
+```bash
+export GEMINI_API_KEY="your-gemini-api-key"
+```
+
+**5. Run the pipeline**
 
 ```bash
 bash pipeline/run_all.sh
 ```
 
-或者如果佢哋唔想用 bash，可以直接行 Python：
+**6. Copy the output files to the website**
 
 ```bash
-python pipeline/01_build_inventory.py
-python pipeline/02_generate_page_records.py
-python pipeline/03_build_visual_summary.py
-... (依次行下去)
+cp output/05_retrieval/page_chunks.jsonl website/server/data/
+cp output/04_gold_master/glossary.json website/server/data/
+cp output/04_gold_master/sections.json website/server/data/
+cp output/10_visual_assets/visual_assets_index.json website/server/data/visual_assets.json
 ```
 
-**或者最簡單嘅方法**：我會提供一個 Python script 叫 `run_pipeline.py`，用戶只需要：
+**7. Start the website**
 
 ```bash
-python run_pipeline.py --input input/急診醫學手冊.pdf
+cd website
+npm install
+npm run dev
 ```
 
-搞掂！Pipeline 會自動行晒所有 12 個步驟。
+Open `http://localhost:3000` in your browser. Your AI knowledge base is ready.
 
 ---
 
-## 第五步：Pipeline 自動處理（大概 2-4 小時，視乎 PDF 有幾大）
+## Step 9: The Output File Structure
 
-用戶坐低等。佢哋會睇到終端機不斷輸出進度：
-
-```
-[2026-04-19 10:00:00] Starting DocOracle pipeline...
-[2026-04-19 10:00:05] Task 1: Building page inventory...
-  - Analyzing 600 pages
-  - Classifying pages: 450 text pages, 80 diagram pages, 70 mixed
-[2026-04-19 10:15:30] Task 2: Generating page records...
-  - Processing pages 1-50 with Gemini Vision API...
-  - Processing pages 51-100...
-  [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 25%
-[2026-04-19 11:45:00] Task 3: Building visual summary...
-[2026-04-19 12:30:00] Task 4: Merging records...
-[2026-04-19 12:45:00] Task 5: Building glossary and FAQ...
-[2026-04-19 13:00:00] Task 6: Building retrieval layer...
-[2026-04-19 13:15:00] Task 7: Building evaluation set...
-[2026-04-19 13:30:00] Task 8: Identifying visual pages...
-[2026-04-19 13:45:00] Task 9: Building visual assets...
-[2026-04-19 14:00:00] Task 10: Building visual metadata...
-[2026-04-19 14:15:00] ✅ Pipeline complete!
-```
-
----
-
-## 第六步：Pipeline 生成嘅輸出文件
-
-Pipeline 完成後，`output/` 目錄會被填滿：
+After the pipeline completes, the `output/` directory contains:
 
 ```
 output/
@@ -178,218 +287,79 @@ output/
 ├── 02_page_records/
 │   ├── page_1.json
 │   ├── page_2.json
-│   ├── ... (600 個文件)
-│   └── page_600.json
-│
-├── 03_visual_reviews/
-│   └── high_risk_pages_summary.md
+│   └── ... (one file per page)
 │
 ├── 04_gold_master/
-│   ├── page_chunks.jsonl          ← 重要！每一頁嘅文字
-│   ├── glossary.json               ← 重要！術語定義
-│   ├── sections.json               ← 重要！章節結構
+│   ├── page_chunks.jsonl          ← Full text content, page by page
+│   ├── glossary.json              ← All extracted terms and definitions
+│   ├── sections.json              ← Chapter/section hierarchy
 │   └── faq_seeds.json
 │
 ├── 05_retrieval/
-│   ├── page_chunks.jsonl           ← 用來搜索嘅
-│   ├── section_chunks.jsonl
-│   └── retrieval_strategy.md
-│
-├── 06_eval/
-│   └── eval_questions.json
+│   ├── page_chunks.jsonl          ← Retrieval-optimised chunks for RAG
+│   └── section_chunks.jsonl
 │
 ├── 10_visual_assets/
 │   ├── diagrams/
 │   │   ├── diagram_001.png
-│   │   ├── diagram_001.json        ← 描述呢張圖
-│   │   ├── diagram_002.png
+│   │   ├── diagram_001.json       ← Spatial description of this diagram
 │   │   └── ...
 │   ├── tables/
 │   │   ├── table_001.png
-│   │   ├── table_001.json
 │   │   └── ...
-│   └── visual_assets_index.json    ← 所有視覺資產嘅索引
+│   └── visual_assets_index.json   ← Index of all visual assets
 │
 └── 09_final_report/
     └── final_report.md
 ```
 
----
+The **4 key files** you need to copy to the website are:
 
-## 第七步：用戶複製關鍵數據文件到網站
-
-現在最重要嘅一步。用戶需要將 **4 個關鍵文件** 複製到網站嘅 `server/data/` 目錄：
-
-```bash
-cp output/04_gold_master/page_chunks.jsonl website/server/data/
-cp output/04_gold_master/glossary.json website/server/data/
-cp output/04_gold_master/sections.json website/server/data/
-cp output/10_visual_assets/visual_assets_index.json website/server/data/
-```
-
-現在 `website/server/data/` 變成咁：
-
-```
-website/server/data/
-├── page_chunks.jsonl              ← 600 頁嘅文字內容
-├── glossary.json                  ← 醫學術語定義
-├── sections.json                  ← 手冊嘅章節結構
-└── visual_assets_index.json       ← 圖表索引
-```
+| File | What it contains |
+|------|-----------------|
+| `output/05_retrieval/page_chunks.jsonl` | Full page-level text for AI retrieval |
+| `output/04_gold_master/glossary.json` | All glossary terms with definitions and page refs |
+| `output/04_gold_master/sections.json` | Chapter/section structure with summaries |
+| `output/10_visual_assets/visual_assets_index.json` | Index of all diagrams, tables, and photos |
 
 ---
 
-## 第八步：用戶啟動網站
+## Frequently Asked Questions
 
-用戶進入 `website/` 目錄，安裝依賴同啟動：
+**Q: How long does the pipeline take?**
+A: Approximately 15 minutes for a 50-page document, 1 hour for 200 pages, and 3 hours for 500 pages. Processing time depends on the number of visual assets (diagrams, tables) since each one is individually analysed by Gemini Vision.
 
-```bash
-cd website/
-npm install
-npm run dev
-```
+**Q: Do I need to pay for the Gemini API?**
+A: Gemini has a free tier that covers small documents (up to ~50 pages). For larger documents, you may need a paid API key. Check [Google AI Studio](https://aistudio.google.com) for current pricing.
 
-網站會喺 `http://localhost:3000` 啟動。
+**Q: Can I use a different LLM instead of Gemini?**
+A: Yes. Edit `pipeline/config.yaml` to point to a different model endpoint. The pipeline is designed to be model-agnostic for the text steps; only the Vision analysis steps require a multimodal model.
 
----
+**Q: What happens if the pipeline fails partway through?**
+A: The pipeline saves progress at each step. If it fails at Step 7, you can re-run from Step 7 without repeating Steps 1–6. Alternatively, delete the job from the UI and start fresh.
 
-## 第九步：醫生可以用 AI 聊天查詢
+**Q: Can I delete a completed knowledge base?**
+A: Yes. Use the trash icon in the Recent Uploads list, or the Delete button on the job detail page. This permanently removes the job and all associated data.
 
-現在醫院嘅醫生可以打開呢個網站，問問題：
-
-**醫生**：「如果病人有嚴重胸痛，我應該做咩檢查？」
-
-**DocOracle AI**：「根據手冊第 245 頁，對於胸痛患者，應該首先進行以下檢查：
-1. 心電圖（ECG）- 手冊第 246 頁有詳細說明
-2. 胸部 X 光 - 手冊第 248 頁
-3. 血液檢查 - 手冊第 250 頁
-
-[顯示相應嘅圖表]
-
-[「Turn into image explanation」按鈕 - 醫生可以點擊生成一張視覺化嘅檢查流程圖]」
+**Q: What file formats are supported?**
+A: Currently PDF only. Support for DOCX, EPUB, and HTML is planned for a future release.
 
 ---
 
-## 總結：用戶會上傳到 GitHub 嘅文件結構
+## Summary: What Users Get
 
-現在你明白咗，用戶需要嘅係：
+After running DocOracle on a document, users have access to:
 
-```
-DocOracle/
-│
-├── README.md                    ← 最重要！清楚解釋點樣用
-├── QUICK_START.md               ← 5 分鐘快速開始指南
-│
-├── pipeline/
-│   ├── requirements.txt
-│   ├── run_all.sh
-│   ├── 01_build_inventory.py
-│   ├── 02_generate_page_records.py
-│   ├── ... (所有 12 個 Python 腳本)
-│   └── config.yaml
-│
-├── website/
-│   ├── (所有網站源代碼)
-│   └── server/data/.gitkeep     ← 空目錄，用戶嘅數據放呢度
-│
-├── input/
-│   └── .gitkeep                 ← 用戶放 PDF 喺呢度
-│
-├── output/
-│   └── .gitkeep                 ← Pipeline 輸出放呢度
-│
-├── docs/
-│   ├── ARCHITECTURE.md
-│   ├── FULL_GUIDE.md
-│   └── EXAMPLE_OUTPUT.md
-│
-└── .gitignore
-```
+| Feature | Description |
+|---------|-------------|
+| **AI Chat with Citations** | Ask questions, get answers with exact page numbers |
+| **Book Structure tab** | Browse chapters and sections; click any to ask about it |
+| **Glossary tab** | Search all extracted terms; click any to ask for more detail |
+| **Start Asking tab** | 6 suggested questions generated from the document |
+| **Visual Asset Retrieval** | Relevant diagrams appear automatically alongside answers |
+| **Image Explanation** | Generate a visual summary of any complex answer |
+| **Delete Controls** | Remove any job (queued, processing, completed, or failed) at any time |
 
 ---
 
-## 用戶一睇 README 就應該明白嘅嘢
-
-你嘅 README 應該包含：
-
-1. **一句話描述**：「將任何技術 PDF 轉換成一個 AI 聊天知識庫」
-
-2. **一張圖**：展示整個流程（PDF → Pipeline → JSON → Website）
-
-3. **Quick Start（5 分鐘）**：
-   ```bash
-   git clone https://github.com/你/DocOracle.git
-   cd DocOracle
-   pip install -r pipeline/requirements.txt
-   cp 你的文件.pdf input/
-   bash pipeline/run_all.sh
-   cd website && npm install && npm run dev
-   ```
-
-4. **詳細步驟**：逐步解釋每一步做咩
-
-5. **輸出會係咩樣**：展示 `output/` 目錄嘅結構
-
-6. **常見問題**：
-   - Q: 要幾耐先完成？A: 視乎 PDF 大小，通常 2-4 小時
-   - Q: 需要 API key 嗎？A: 需要 Gemini API key（免費額度有限）
-   - Q: 可以用其他 LLM 嗎？A: 可以，改 `config.yaml` 就得
-
----
-
-## 最重要嘅一點：你要準備一個「範例輸出」
-
-用戶最想睇嘅係：「如果我用咗你嘅 pipeline，最後會得到啲咩嘢？」
-
-所以你應該在 GitHub 上提供一個 **sample output 目錄**，裡面有：
-
-```
-sample_output/
-├── page_chunks.jsonl (前 10 頁嘅範例)
-├── glossary.json (前 20 個詞彙嘅範例)
-├── sections.json (章節結構範例)
-├── visual_assets_index.json (前 5 個視覺資產嘅範例)
-└── README.md (解釋呢啲文件係咩)
-```
-
-咁用戶就可以唔使行 pipeline，直接用呢啲 sample data 啟動網站，睇下效果。
-
----
-
-## 最後：用戶會問嘅問題
-
-當用戶睇到你嘅項目時，佢哋心裡會問：
-
-1. ✅ **「我點樣用？」** → README 要清楚
-2. ✅ **「要幾耐？」** → 要講清楚時間
-3. ✅ **「最後會得到啲咩？」** → 要有 sample output
-4. ✅ **「我需要咩技能？」** → 要清楚講 Python/Node.js 知識要求
-5. ✅ **「要俾錢嗎？」** → 要講清楚 API 成本（Gemini Vision API 有免費額度）
-
----
-
-## 你要上傳嘅文件清單
-
-總結一下，你要上傳到 GitHub 嘅係：
-
-| 文件/目錄 | 用途 | 必須嗎？ |
-|---------|------|--------|
-| `README.md` | 項目介紹 + Quick Start | **必須** |
-| `QUICK_START.md` | 5 分鐘快速指南 | **必須** |
-| `pipeline/*.py` | 12 個處理腳本 | **必須** |
-| `pipeline/run_all.sh` | 一鍵執行 | **必須** |
-| `pipeline/requirements.txt` | Python 依賴 | **必須** |
-| `website/` | 完整網站源代碼 | **必須** |
-| `docs/ARCHITECTURE.md` | 系統架構 | 推薦 |
-| `docs/FULL_GUIDE.md` | 詳細步驟 | 推薦 |
-| `sample_output/` | 範例輸出 | 推薦 |
-| `LICENSE` | MIT License | **必須** |
-| `.gitignore` | 忽略文件列表 | **必須** |
-
----
-
-## 最重要嘅一句話
-
-**用戶下載你嘅項目後，應該能夠 5 分鐘內理解「我要做咩」，30 分鐘內開始跑 pipeline，2-4 小時後得到一個完整嘅 AI 知識庫網站。**
-
-如果用戶做唔到呢啲，就代表你嘅 README 同文檔寫得唔夠清楚。
+*DocOracle — because every document deserves to be understood.*
