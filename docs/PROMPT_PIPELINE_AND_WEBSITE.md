@@ -18,7 +18,9 @@
 
 ---
 
-## The Prompt (Optimized For Cursor)
+## The Prompt (Optimized For Cursor + Claude Opus 4.7 Max*)
+
+> **Claude models often gives the most complete and aesthetic design  - it's a bit more expensive with API usage but definitely worth it!**
 
 ```
 You are an autonomous document-ingestion, knowledge-system, and web-product development agent.
