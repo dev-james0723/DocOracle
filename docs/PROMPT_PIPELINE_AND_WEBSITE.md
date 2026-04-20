@@ -23,7 +23,7 @@
 ```
 You are an autonomous document-ingestion, knowledge-system, and web-product development agent.
 
-Before doing any implementation work, you must first ensure that Gemini API access is properly configured, because later stages of this workflow depend on Gemini for multimodal understanding, including visual page analysis, image-related reasoning, and grounded chat / fallback behavior where applicable.
+Before doing any implementation work, you must first ensure that Gemini API access is properly configured, because later stages of this workflow depend on Gemini for multimodal understanding, including visual page analysis, image-related reasoning, grounded chat, language-adaptive answers, web search fallback, and explanation-image generation.
 
 Do NOT start the pipeline.
 Do NOT start building the website.
@@ -38,7 +38,7 @@ STEP 0 — GEMINI API KEY SETUP (MANDATORY, MUST HAPPEN FIRST)
 At the very beginning, immediately prompt the user with a clear setup message.
 Use language similar to the following:
 
-"This workflow requires Gemini API access before it can begin, because later stages use Gemini for visual page analysis, multimodal document understanding, and AI-powered document interaction.
+"This workflow requires Gemini API access before it can begin, because later stages use Gemini for visual page analysis, multimodal document understanding, AI-powered document interaction, response language adaptation, web-grounded fallback, and explanation-image generation.
 
 Please set up your Gemini API key first.
 
@@ -82,6 +82,22 @@ DESIRED CURSOR BEHAVIOR:
 - Keep the instruction short and direct.
 - The user should feel that the agent is actively guiding setup, not merely describing it.
 
+ADDITIONAL CURSOR BEHAVIOR:
+Inside Cursor, do not just tell the user to find the environment file manually.
+You must proactively open the Environment / .env editing surface for the user inside Cursor if available.
+If Cursor supports directly opening the environment variables UI or the .env file tab, do that automatically.
+Do not make the user browse folders to locate the environment file.
+
+Required behavior:
+- automatically open the Environment tab, environment variable editor, or .env file in Cursor
+- if no .env file exists, create it and open it immediately
+- place the cursor directly on the GEMINI_API_KEY line
+- show the user exactly where to paste the key
+- keep the setup flow visible and obvious
+- do not proceed until the user confirms the Gemini API key has been pasted
+
+If Cursor has both an Environment variables UI and a .env file workflow, prefer whichever is more direct and least confusing for the user.
+The goal is that the user should not need to search through folders to find the environment file manually.
 
 ==============================================================
 MANDATORY TECH STACK
@@ -135,9 +151,12 @@ Important:
 - the workflow must still proceed even if Cursor skill discovery does not work
 - treat skill import as an optimization, not as a hard dependency
 
+If Cursor skill import from the cloned Git repository does not work reliably, fall back to:
+1. reading the SKILL.md file directly
+2. extracting its design / implementation guidance
+3. applying that guidance manually during the build
 
 CINEMATIC DESIGN DIRECTION:
-
 1. The website should feel cinematic, premium, and art-directed, but still highly usable.
 2. It should not feel too scholarly, too stiff, or too text-heavy in presentation.
 3. Leave room for design exploration and creativity.
@@ -159,9 +178,7 @@ Do NOT blindly copy its architecture, routing, content model, or interaction log
 Do NOT let cinematic styling override document usability.
 
 This project should look premium, but it must behave like a serious document exploration product.
-
-The final website in this task is a document-native AI knowledge base
-
+The final website in this task is a document-native AI knowledge base.
 If any design choice conflicts with page exploration, citation interactivity, glossary browsing, section navigation, visual browsing, or PDF access, choose document usability.
 
 ==============================================================
@@ -244,7 +261,34 @@ User wants to inspect the original source → can open the PDF directly from mul
 
 If these flows are weak, the build is not successful even if all files compile.
 
+==============================================================
+RESPONSE LANGUAGE MATCHING REQUIREMENTS (CRITICAL)
+==============================================================
 
+The AI Chat must respond in the user's language by default.
+
+This rule applies even when:
+- the uploaded PDF is written in a different language
+- the source material is primarily in English
+- the retrieved evidence comes from English text
+- the document language and the user's question language do not match
+
+REQUIRED BEHAVIOR:
+1. Detect the language of the user's question.
+2. Answer in that same language by default.
+3. If the PDF is in another language, first use the document content as evidence, then translate / restate the answer into the user's language.
+4. Preserve citations and grounding while adapting the final answer language.
+5. Do not simply copy the document language if the user asked in another language.
+
+EXAMPLES:
+- If the PDF is in English but the user asks in Traditional Chinese, the response should be in Traditional Chinese.
+- If the PDF is in English but the user asks in Japanese, the response should be in Japanese.
+- If the user switches languages in a later turn, follow the language of the latest user message unless the user explicitly asks otherwise.
+
+IMPORTANT:
+- The answer language should follow the user's language, not the document's language.
+- Citations, page numbers, and source references should remain accurate while the explanatory text is translated into the user's language.
+- If a technical term is best preserved in the original language, you may include the original term alongside the translated explanation.
 
 ==============================================================
 DOCUMENT-SPECIFIC VISUAL TAXONOMY REQUIREMENTS
@@ -286,7 +330,6 @@ For a different uploaded PDF, the semantic visual categories must be derived fro
 Do not reuse the same semantic categories across unrelated documents unless they genuinely fit.
 
 HOW TO BUILD THE VISUAL TAXONOMY:
-
 1. Use the pipeline outputs plus visual descriptions to infer semantic visual topics.
 2. Group visuals by what they are about, not only by their low-level image type.
 3. Prefer user-meaningful categories over purely technical extraction labels.
@@ -300,7 +343,6 @@ Each visual asset should ideally have BOTH:
 - a higher-level semantic visual category, such as Microphones or Orchestra recording
 
 VISUALS PAGE REQUIREMENTS:
-
 The Visuals page should support browsing by both:
 1. generic type
 2. semantic visual category
@@ -328,7 +370,58 @@ Before finalizing the website, verify that:
 - the categories help users understand the document's visual knowledge structure
 - visual cards feel grouped and organized in a way that matches the document topic
 
+==============================================================
+LIGHTBOX IMAGE VIEWER REQUIREMENTS (CRITICAL)
+==============================================================
 
+The website contains many image thumbnails, page screenshots, extracted visuals, and preview images.
+Users must be able to click or tap these images and open them in a proper Lightbox viewer.
+
+This is not optional.
+A separate detail page alone is not sufficient.
+If an image is shown in the interface, the user should be able to inspect it more closely through an enlarged viewer.
+
+REQUIRED BEHAVIOR:
+1. Clickable / tappable thumbnails
+- thumbnails shown in the website should be interactive where appropriate
+- users should be able to click or tap them to inspect the image in more detail
+
+2. Lightbox viewer
+- when the user opens an image, show it in a Lightbox, modal image viewer, or equivalent focused overlay experience
+- the viewer should feel intentional and polished
+- do not merely navigate to a static page that still does not allow close inspection
+
+3. Zoom support
+Inside the Lightbox viewer, the user should be able to:
+- zoom in
+- zoom out
+- inspect fine details
+
+If useful, also support:
+- pan / drag while zoomed
+- fit-to-screen behavior
+- reset zoom
+
+4. Good sources for the Lightbox
+The Lightbox should work for image surfaces such as:
+- visual thumbnails
+- page screenshots
+- extracted diagrams
+- extracted photos
+- extracted tables where enlargement helps readability
+- image previews inside page detail or visual detail views
+
+5. Mobile usability
+The Lightbox viewer must also work well on phones and tablets.
+Users should be able to inspect images on smaller screens without a broken experience.
+
+QUALITY GATE:
+Before finalizing, verify all of the following:
+- important image thumbnails are actually clickable
+- clicking opens a Lightbox or equivalent viewer
+- the user can zoom in and zoom out
+- the image can be meaningfully inspected
+- the feature works on desktop and mobile
 
 ==============================================================
 TURN INTO IMAGE EXPLANATION FEATURE REQUIREMENTS (CRITICAL)
@@ -343,7 +436,6 @@ This is not only a visual design element.
 It must be a real, functioning capability in the chat experience.
 
 REQUIRED BEHAVIOR:
-
 1. The button must appear in the AI Chat interface
 - after assistant answers where visual explanation would be useful
 - especially for complex, technical, spatial, structural, process-based, or concept-dense answers
@@ -378,14 +470,6 @@ Do not substitute another image model.
 Do not leave the model ambiguous.
 Do not implement the button without actually wiring it to Nano Banana Pro.
 
-COMMON FAILURE MODES TO AVOID:
-- button exists but does nothing
-- button exists but is not wired to real generation
-- generation uses the wrong model
-- generated image is decorative rather than explanatory
-- generated image opens in an awkward disconnected flow
-- explanation image is not shown back in the chat context
-
 QUALITY GATE:
 Before finalizing, verify all of the following:
 - the button visibly exists in the chat UI
@@ -394,8 +478,6 @@ Before finalizing, verify all of the following:
 - the generation uses Nano Banana Pro
 - the returned image meaningfully explains the answer
 - the image is displayed back inside the AI Chat experience
-
-If the button is missing, inert, vague, or not wired to Nano Banana Pro, this requirement is not satisfied.
 
 ==============================================================
 REAL PAGE IMAGE RENDERING REQUIREMENTS (CRITICAL)
@@ -408,7 +490,6 @@ This is mandatory.
 Do not treat page-image rendering as optional, deferred, or implied.
 
 REQUIRED BEHAVIOR:
-
 1. Render PDF pages into actual image files
 - render pages from the PDF into PNG or another high-quality web-displayable image format
 - preserve page order and page numbering
@@ -445,15 +526,6 @@ These rendered images should power:
 - extracted visual assets are separate objects derived from full pages
 - both layers must exist if the website is to function properly
 
-COMMON FAILURE TO AVOID:
-The agent must not conclude the task after only:
-- classifying pages
-- describing visuals in text
-- generating visual metadata
-- extracting a few assets
-
-If real page image files do not exist and are not visible in the website, this requirement is not satisfied.
-
 QUALITY GATE:
 Before finalizing, verify all of the following:
 - the PDF pages were actually rendered into image files
@@ -461,8 +533,6 @@ Before finalizing, verify all of the following:
 - the website successfully displays those images
 - page cards, page detail views, and relevant visual views are using real image assets
 - no placeholder, blank, or missing image behavior remains
-
-If the rendered page images are missing, the pipeline and website are incomplete.
 
 ==============================================================
 DATA QUALITY, INFORMATION ARCHITECTURE, AND ORGANIZATION REQUIREMENTS
@@ -486,7 +556,6 @@ The agent must actively improve information organization before shipping the UI.
 Do not treat first-pass extraction output as presentation-ready.
 
 REQUIRED DATA NORMALIZATION PASSES:
-
 1. Title normalization
 - infer the best available human-readable title for each page
 - avoid default labels like "Page 3" unless no better label can be derived
@@ -543,7 +612,6 @@ Visuals page:
 - visual descriptions should be concise but informative
 
 QUALITY GATE BEFORE FINALIZING THE WEBSITE:
-
 Before finalizing the website, the agent must inspect whether the browsing experience feels organized.
 Specifically verify:
 - page titles are meaningful
@@ -555,7 +623,6 @@ Specifically verify:
 - the browsing interface helps users understand the document instead of exposing extraction mess
 
 If the data feels disorganized, the agent must improve the normalization and presentation layers before considering the task complete.
-
 
 ==============================================================
 CHAT UX, LAYOUT, AND INTERACTION REQUIREMENTS
@@ -668,7 +735,6 @@ NON-NEGOTIABLE RULES:
 8. Do not start any Gemini-dependent stage until API setup is confirmed
 
 PIPELINE OUTPUT STRUCTURE:
-
 Create the following folder structure:
 
 PDF_PROJECT_OUTPUT/
@@ -684,20 +750,20 @@ PDF_PROJECT_OUTPUT/
   03_visual_reviews/
     high_risk_pages_summary.md
   04_gold_master/
-    glossary.json              (KEY FILE: terms, definitions, categories, pages)
-    sections.json              (KEY FILE: chapter hierarchy, summaries, keywords)
+    glossary.json
+    sections.json
     faq_seeds.json
     suggested_prompts.json
   05_retrieval/
-    page_chunks.jsonl          (KEY FILE: one JSON line per page chunk)
+    page_chunks.jsonl
     section_chunks.jsonl
   06_eval/
-    eval_questions.json        (80+ evaluation questions)
+    eval_questions.json
   07_skill/
     document_skill.md
     document_skill_system_prompt.txt
   10_visual_assets/
-    visual_assets_index.json   (KEY FILE: all visual assets with retrieval tags)
+    visual_assets_index.json
     diagrams/
     tables/
     photos/
@@ -742,8 +808,6 @@ For every page, create page_NNNN.json with fields:
 - uncertainties
 - keywords
 - page_summary_strict
-
-Also add website-supporting fields where useful:
 - linked_terms
 - linked_sections
 - suggested_page_questions
@@ -884,7 +948,6 @@ Prioritize the following:
 
 Do not spend excessive effort on outputs that do not improve the final website UX.
 
-
 PRE-PRESENTATION CURATION REQUIREMENT:
 Before rendering extracted data into the website, run a curation / normalization layer that transforms raw extraction output into presentation-ready browse objects.
 This layer should improve:
@@ -918,13 +981,12 @@ Include:
 - “Start Exploring” call-to-action
 
 Feature 2 — AI Chat Interface
-This is a core feature, but not the only one.
 Users type questions and receive answers that are:
 - grounded in the document using retrieved page chunks
 - cited with specific page numbers
 - accompanied by relevant diagrams or tables when available
 - connected to related sections / pages / visuals when possible
-
+- returned in the language of the user's latest message by default
 
 Feature 2A — Rich Text Answer Rendering (CRITICAL)
 The AI chat response must be rendered in rich text format, not as plain raw text.
@@ -951,7 +1013,6 @@ Desired answer presentation:
 - well-formatted follow-up suggestions
 - related visuals presented as structured cards below the answer when relevant
 
-
 Feature 2B — Chat History Tab (CRITICAL)
 The Chat page must include a dedicated Chat History tab or equivalent history panel where users can view their past conversations and prior interactions with the chat.
 
@@ -977,7 +1038,6 @@ If appropriate, also preserve interaction history such as:
 
 The Chat History tab must be designed clearly for both desktop and mobile.
 Do not hide it in a way that makes it hard to discover.
-
 
 Feature 2C — Premium Chat Layout and Flow (CRITICAL)
 The Chat page must be intentionally designed as a premium conversational research interface.
@@ -1031,6 +1091,43 @@ Support both themes with a toggle button.
 Feature 8 — Responsive Design
 The website must work correctly on both desktop and mobile.
 
+Feature 8A — Full Device Responsiveness (CRITICAL)
+All website elements, layouts, and interactions must be fully responsive across device sizes, especially for phone users.
+Do not treat mobile responsiveness as an afterthought.
+The website must be intentionally designed for:
+- mobile phones
+- tablets
+- laptops
+- desktop screens
+
+This requirement applies to all major UI surfaces, including:
+- landing page
+- chat page
+- answer cards
+- citation chips
+- glossary browser
+- section navigator
+- page explorer
+- visual asset browser
+- visual detail views
+- PDF access links or source actions
+- consent cards
+- follow-up action buttons
+- navigation headers and menus
+
+Mobile-specific expectations:
+- no text overflow
+- no clipped citation chips
+- no broken card widths
+- no horizontal scrolling unless explicitly justified
+- buttons must be finger-friendly
+- tap targets must be large enough
+- stacked layouts should remain readable
+- cards and grids should collapse gracefully
+- long answers should remain easy to scan on narrow screens
+- visual assets should scale cleanly without breaking the layout
+- fixed headers / footers must not obstruct core content
+
 Feature 9 — Gemini Web Search Fallback (CRITICAL FEATURE)
 This feature handles the case where the document does not contain enough information to answer the user's question. Instead of leaving the user with a dead end, the chat interface offers to search the web using Gemini's grounding capability — but only after asking the user for consent.
 
@@ -1048,7 +1145,6 @@ For each page, show:
 - “Open original PDF at this page”
 - “Ask AI about this page”
 - suggested page questions
-
 
 Feature 10A — Real Page Thumbnails and Rendered Source Images (CRITICAL)
 The website must use actual rendered PDF page images for browsing and page detail experiences.
@@ -1091,67 +1187,16 @@ Visuals must be first-class content, not decorative attachments.
 Allow users to:
 - browse all visuals
 - filter by type (diagram / table / photo / mixed)
+- filter by document-specific semantic visual category
 - open a visual detail view
 - inspect description and source page
 - jump back to source page
 - ask AI about a specific visual
 
-
-Feature 8A — Full Device Responsiveness (CRITICAL)
-All website elements, layouts, and interactions must be fully responsive across device sizes, especially for phone users.
-Do not treat mobile responsiveness as an afterthought.
-The website must be intentionally designed for:
-- mobile phones
-- tablets
-- laptops
-- desktop screens
-
-This requirement applies to all major UI surfaces, including:
-- landing page
-- chat page
-- answer cards
-- citation chips
-- glossary browser
-- section navigator
-- page explorer
-- visual asset browser
-- visual detail views
-- PDF access links or source actions
-- consent cards
-- follow-up action buttons
-- navigation headers and menus
-
-Mobile-specific expectations:
-- no text overflow
-- no clipped citation chips
-- no broken card widths
-- no horizontal scrolling unless explicitly justified
-- buttons must be finger-friendly
-- tap targets must be large enough
-- stacked layouts should remain readable
-- cards and grids should collapse gracefully
-- long answers should remain easy to scan on narrow screens
-- visual assets should scale cleanly without breaking the layout
-- fixed headers / footers must not obstruct core content
-
-The agent must actively test and refine responsive behavior rather than assuming Tailwind defaults are sufficient.
-Responsive quality is part of the product requirement, not a finishing pass.
-
-
-INFORMATION ARCHITECTURE REQUIREMENTS:
-
-VISUAL TAXONOMY AND FILTERING REQUIREMENTS:
-- Keep generic visual types for backend / technical use.
-- Also generate document-specific semantic visual categories from the uploaded PDF.
-- The Visuals page must support filtering or browsing by those semantic categories.
-- Do not rely only on generic type labels as the primary organization system.
-- Visual browsing should feel topic-aware and document-aware.
-
-- The browsing experience must feel organized, trustworthy, and semantically coherent.
-- Do not show low-quality extraction output directly in cards when it can be normalized.
-- Prefer fewer, better section objects over many messy or repetitive ones.
-- Prefer clean previews over long noisy text fragments.
-- Ensure card layouts support quick scanning and clear hierarchy.
+Feature 14A — Lightbox Image Viewer (CRITICAL)
+Image thumbnails and previews across the website must support a proper Lightbox or modal image viewer with zoom in / zoom out capabilities.
+This is especially important for visuals, extracted diagrams, full-page screenshots, and any image where close inspection matters.
+A dedicated detail page alone is not enough if the image still cannot be enlarged and inspected.
 
 ==============================================================
 HOW THE WEBSITE SHOULD FEEL
@@ -1266,13 +1311,16 @@ WEBSITE ARCHITECTURE
 ==============================================================
 
 Frontend:
-- React + Tailwind CSS (or similar modern framework)
+- Next.js
+- Tailwind CSS
+- TypeScript
 
 Backend:
-- Express + tRPC (or similar API framework)
+- Next.js server routes / route handlers, or tRPC if useful
+- use the simplest architecture that still preserves strong type safety and clean separation of concerns
 
 LLM:
-- Gemini API (required for web search fallback and multimodal document analysis)
+- Gemini API (required for web search fallback, multimodal document analysis, response language adaptation, and explanation-image generation)
 
 Image Generation:
 - Nano Banana Pro model (required for Feature 6 — do not substitute)
@@ -1295,6 +1343,7 @@ For each chat query:
 - search for relevant chunks (top 8)
 - search for relevant visual assets (top 4)
 - construct a prompt with system prompt + evidence + question
+- instruct the model to answer in the user's language
 - send to LLM
 - return:
   - answer
@@ -1356,26 +1405,37 @@ Any citation/page chip/source reference → open original PDF or page-linked sou
 
 If these flows are weak, the build is not successful.
 
-
 RICH TEXT AND RESPONSIVE UI REQUIREMENTS:
-
-CHAT HISTORY REQUIREMENTS:
-- The Chat page must include a Chat History tab, drawer, sidebar, or equivalent clearly accessible history surface.
-- Users must be able to revisit previous conversations and continue them.
-- The history UI must also be responsive and usable on phones.
-
 - The chat answer UI must render rich text, not plain raw text blocks.
 - The frontend should use a proper renderer for formatted assistant content.
 - Typography, spacing, list styling, citations, and follow-up actions must all be visually polished.
 - All UI surfaces must be fully device responsive, especially on phones.
 - The agent must inspect layouts on narrow viewports and adjust components where needed.
 
+CHAT HISTORY REQUIREMENTS:
+- The Chat page must include a Chat History tab, drawer, sidebar, or equivalent clearly accessible history surface.
+- Users must be able to revisit previous conversations and continue them.
+- The history UI must also be responsive and usable on phones.
+
+INFORMATION ARCHITECTURE REQUIREMENTS:
+- The browsing experience must feel organized, trustworthy, and semantically coherent.
+- Do not show low-quality extraction output directly in cards when it can be normalized.
+- Prefer fewer, better section objects over many messy or repetitive ones.
+- Prefer clean previews over long noisy text fragments.
+- Ensure card layouts support quick scanning and clear hierarchy.
+
+VISUAL TAXONOMY AND FILTERING REQUIREMENTS:
+- Keep generic visual types for backend / technical use.
+- Also generate document-specific semantic visual categories from the uploaded PDF.
+- The Visuals page must support filtering or browsing by those semantic categories.
+- Do not rely only on generic type labels as the primary organization system.
+- Visual browsing should feel topic-aware and document-aware.
+
 ==============================================================
 IMPLEMENTATION PRIORITIES
 ==============================================================
 
 When forced to choose, prioritize in this order:
-
 1. Strong page-level exploration
 2. Strong citation and page navigation
 3. Data normalization and browse-page organization
@@ -1408,18 +1468,25 @@ OPERATING INSTRUCTIONS
 - Do not stop at text-only visual analysis; ensure rendered page images are produced and connected to the frontend
 - If context limits are reached, continue in batches and merge at the end
 - After environment setup, verify Gemini-dependent steps are actually usable
-
 - Ensure the AI chat response is rendered as rich text, not plain raw text
 - Ensure the Chat page includes a clearly accessible Chat History tab or history panel
 - Verify that past chat sessions can be reopened and continued correctly
-
+- Verify that the Chat page feels organized, premium, and easy to continue using after each answer
+- Remove weakly related visuals or low-signal citations that clutter the answer view
+- Ensure the composer, answer card, citations, related visuals, and next actions work as one coherent flow
+- Verify that the Turn into Image Explanation button exists, works, and uses Nano Banana Pro
+- Verify that tapping the button returns a detailed explanation image inside the chat flow
+- Verify that image thumbnails and previews can open in a Lightbox with zoom support
+- Verify that actual rendered PDF page images exist, are served correctly, and appear in the UI
+- Ensure page thumbnails and page-detail visuals are using real rendered images rather than text-only placeholders
 - Verify that page cards and section cards do not expose messy raw extraction output
 - Verify that titles, summaries, page ranges, and badges are normalized and trustworthy
 - Fix repetitive or semantically weak section labels before finalizing
 - Verify that the Visuals page is organized by meaningful document-specific visual categories, not only generic types
 - Ensure semantic visual filters are useful and intuitive for this document
 - Test mobile responsiveness carefully across all major pages and interaction surfaces
-- Verify that answer cards, citation chips, buttons, visuals, and navigation all remain usable on phones
+- Verify that answer cards, citation chips, buttons, visuals, navigation, and lightbox behavior all remain usable on phones
+- Verify response language matching: asking in Traditional Chinese returns Traditional Chinese, asking in English returns English, asking in another supported language returns that language
 - After building the website, verify it works by testing at least 3 different questions
 - Include at least one question that the document cannot answer, to confirm the web search fallback triggers correctly
 - Also test at least:
@@ -1454,6 +1521,44 @@ FINAL INSTRUCTION
 Do not stop at a generic summary.
 Do not build a generic “chat with PDF” wrapper.
 Complete the full pipeline and build an exploration-first, page-aware, citation-driven, multimodal AI knowledge base website that preserves access to the original document and makes the document easy to browse, inspect, and ask about.
+
+Deployment hardening requirement for hosting platforms (e.g. Vercel):
+
+Make this app self-contained for deployment. Do not rely on sibling folders, parent directories, or local-only filesystem paths at runtime.
+
+Requirements:
+1. Bundle all extracted book data needed by the app into the app project itself at build time.
+2. Automatically detect the source PDF if it exists at the workspace root as `source.pdf`.
+3. Update the bundling/build scripts so that, during build preparation, the root-level `source.pdf` is copied into the app's deployable public assets (for example `public/source.pdf`) automatically.
+4. If extracted data currently lives outside the app folder (for example in a sibling `PDF_PROJECT_OUTPUT` directory), generate bundled artifacts inside the app so Vercel can deploy them without needing external filesystem access.
+5. Ensure the production app does not depend on runtime reads from paths like `../PDF_PROJECT_OUTPUT` or other non-deployed local paths.
+6. Add safe fallback logic:
+   - prefer bundled/generated in-app data in production
+   - allow local external data only as a development convenience
+7. Verify that the deployed app can:
+   - serve the PDF from the deployed site
+   - load non-zero page/section/glossary/visual counts
+   - work even if the original external data folders are absent in Vercel
+8. Before finishing, run a production build and confirm the app is deployment-ready.
+
+Implementation guidance:
+- Treat `source.pdf` at workspace root as the canonical default input PDF unless a more explicit configured path is provided.
+- Update package scripts and bundling scripts as needed so this happens automatically before build.
+- Prefer a deterministic generated-data folder inside the app (for example `src/generated`).
+- If existing gold-master JSON files are empty, synthesize usable fallback data from page records/chunks so the deployed UI does not show zeros.
+- Do not leave the app depending on undeployed local files.
+
+Success criteria:
+- `public/source.pdf` exists in the deployable app output when a root `source.pdf` exists.
+- The deployed Vercel app is self-contained and does not break when external local folders are missing.
+
+LASTLY:
+
+- After the full workflow is complete, start the local development server and open the localhost preview automatically inside Cursor if possible.
+- Prefer opening the website in Cursor's built-in preview / portal so the user can immediately inspect the final website without manually starting or locating it.
+- If the app runs on a standard local port such as localhost:3000, localhost:3001, or another detected port, open that live preview for the user automatically after the build succeeds.
+- Do not stop at code completion alone; the final workflow should end with a working localhost preview of the website visible to the user inside Cursor.
+- The task is not complete until the website is running locally and a live localhost preview has been opened for inspection inside Cursor.
 
 ```
 
