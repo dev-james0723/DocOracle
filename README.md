@@ -8,6 +8,12 @@ DocOracle is an open-source project that transforms any PDF document into a full
 
 ---
 
+## Language | 語言 | 言語 | Sprache
+
+[English](README.md) · [繁體中文](README.zh-TW.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Deutsch](README.de.md)
+
+---
+
 ## Why DocOracle? (Why Not Just Upload a PDF to ChatGPT?)
 
 You might be wondering: *"Can't I just upload my PDF to ChatGPT or Claude and ask questions?"*
